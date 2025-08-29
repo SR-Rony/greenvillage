@@ -1,0 +1,76 @@
+"use client";
+
+import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import banner from "@/public/banner/banner.png"
+import banner4 from "@/public/banner/banner4.jpg"
+import banner2 from "@/public/banner/banner2.jpg"
+
+const slides = [
+  {
+    id: 1,
+    title: "Fresh & Organic Vegetables",
+    subtitle: "Direct from village farms to your home.",
+    image: banner,
+  },
+  {
+    id: 2,
+    title: "Farm Fresh Eggs & Chicken",
+    subtitle: "Healthy, organic, and chemical-free.",
+    image: banner2,
+  },
+  {
+    id: 3,
+    title: "Fresh Fish & Dairy Products",
+    subtitle: "Delivered with love from Greenvillage.",
+    image: banner4,
+  },
+];
+
+export default function BannerSlider() {
+  return (
+    <section className="w-full relative mt-7">
+      <Swiper
+        modules={[Autoplay, Pagination, Navigation]}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        navigation={true}
+        loop={true}
+        className="w-full h-[300px] md:h-[500px] lg:h-[600px] overflow-hidden"
+      >
+        {slides.map((slide) => (
+          <SwiperSlide key={slide.id}>
+            <div className="relative w-full h-full">
+              <Image
+                src={slide.image}
+                alt={slide.title}
+                fill
+                priority
+                className="object-cover"
+              />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-black/40"></div>
+
+              {/* Content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
+                  {slide.title}
+                </h2>
+                <p className="mt-3 text-sm md:text-lg text-gray-200 drop-shadow">
+                  {slide.subtitle}
+                </p>
+                <button className="mt-5 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold shadow">
+                  Shop Now
+                </button>
+              </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
+  );
+}
