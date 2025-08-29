@@ -6,9 +6,9 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import banner from "@/public/banner/banner.png"
-import banner4 from "@/public/banner/banner4.jpg"
-import banner2 from "@/public/banner/banner2.jpg"
+import banner from "@/public/banner/banner.png";
+import banner4 from "@/public/banner/banner4.jpg";
+import banner2 from "@/public/banner/banner2.jpg";
 
 const slides = [
   {
@@ -71,6 +71,37 @@ export default function BannerSlider() {
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* ✅ Swiper custom styles */}
+      <style jsx global>{`
+        /* Arrows */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #16a34a; /* Green-600 */
+            transition: color 0.3s;
+        }
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            color: #15803d; /* Darker Green */
+        }
+
+        /* Hide arrows on small screens */
+        @media (max-width: 767px) {
+            .swiper-button-next,
+            .swiper-button-prev {
+            display: none;
+            }
+        }
+
+        /* Pagination dots */
+        .swiper-pagination-bullet {
+            background: #d1d5db; /* Gray-300 default */
+            opacity: 1;
+        }
+        .swiper-pagination-bullet-active {
+            background: #16a34a; /* Green-600 */
+        }
+        `}</style>
     </section>
   );
 }
