@@ -35,7 +35,7 @@ export default function Navbar() {
               href="/"
               className="text-2xl font-extrabold text-[var(--primary)] tracking-wide hover:scale-105 transition-transform"
             >
-              Greenvillage
+              GreenVillage
             </Link>
           </div>
 
