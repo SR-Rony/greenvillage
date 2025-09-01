@@ -3,6 +3,7 @@
 // import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { removeItem, updateQuantity, clearCart } from "@/redux/features/cart/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import Image from "next/image";
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
@@ -24,7 +25,7 @@ export default function CartPage() {
               >
                 <div className="flex items-center gap-4">
                   {item.image && (
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
                       className="w-16 h-16 rounded-lg object-cover"

@@ -5,6 +5,7 @@ import Navbar from "@/components/header/navbar";
 import Footer from "@/components/footer/footer";
 import Providers from "./providers";
 import CartIcon from "@/components/cart/cartIcon";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Footer />
           <CartIcon /> {/* ✅ floating cart icon */}
         </Providers>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

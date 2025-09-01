@@ -1,16 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ShoppingCart, User, Home, LayoutGrid, Package, Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect } from "react";
+import { User, Home, LayoutGrid, Package, Phone, LogOut, Settings,LayoutDashboard  } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SearchBar from "./searchbar";
 import MenuItem from "./menuItem";
 import Sitebar from "./sitebar";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { useRouter } from "next/navigation";
+import { logout as logoutAction  } from "@/redux/features/auth/authSlice";
 
 export default function Navbar() {
-  const [cartCount] = useState(3);
+  const user = useAppSelector((state) => state.auth.user);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const userName = user?.name?.slice(0, 2).toUpperCase() || "GU"
+
+  const dispatch = useAppDispatch()
 
   const categories = [
     "All Products",
@@ -22,6 +30,26 @@ export default function Navbar() {
     "New Arrivals",
     "Trending",
   ];
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownRef]);
+
+  const handleLogout = () => {
+    dispatch(logoutAction())
+    setDropdownOpen(false);
+    router.push("/login");
+    // TODO: dispatch logout in Redux if needed
+
+  };
+
   return (
     <header className="w-full sticky top-0 z-50 shadow-md bg-gradient-to-r from-gray-50 to-gray-100">
       {/* Top Row: Menu + Logo + Right Icons */}
@@ -29,8 +57,7 @@ export default function Navbar() {
         <div className="w-full flex items-center justify-between md:justify-start gap-3 md:gap-4">
           {/* Left: Menu + Logo */}
           <div className="flex items-center gap-3">
-            <Sitebar/>
-
+            <Sitebar />
             <Link
               href="/"
               className="text-2xl font-extrabold text-[var(--primary)] tracking-wide hover:scale-105 transition-transform"
@@ -39,41 +66,70 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Right: User + Cart */}
-          <div className="flex items-center gap-3 md:ml-auto">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-700 hover:bg-gray-200 rounded-lg p-2 transition"
-            >
-              <User className="h-6 w-6" />
-            </Button>
-
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-700 hover:bg-gray-200 rounded-lg p-2 transition"
-              >
-                <ShoppingCart className="h-6 w-6" />
-              </Button>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[var(--primary)] text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-md">
-                  {cartCount}
+          {/* User Icon / Login & Register */}
+          <div className="flex items-center gap-3 md:ml-auto relative" ref={dropdownRef}>
+            {user ? (
+              <div>
+                <span
+                  className="text-[var(--primary)] cursor-pointer flex items-center gap-1"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  <User className="h-5 w-5" />
+                  <span>{userName}</span>
                 </span>
-              )}
-            </div>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                    <ul className="flex flex-col">
+                      <li>
+                        <Link
+                          href="/profile"
+                          className="flex items-center gap-2 px-4 py-2 hover:text-[var(--primary)] hover:bg-gray-100 rounded-t-xl"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <Settings className="w-4 h-4" /> Profile
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/dashboard"
+                          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 hover:text-[var(--primary)] rounded-t-xl"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <LayoutDashboard  className="w-4 h-4" /> Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-2 px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100 w-full rounded-b-xl"
+                        >
+                          <LogOut className="w-4 h-4" /> Logout
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Link href="/login" className="hover:text-[var(--primary)]">Login</Link>
+                <span className="text-[var(--primary)]">/</span>
+                <Link href="/register" className="hover:text-[var(--primary)]">Register</Link>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Search Input */}
         <div className="w-full md:ml-15 md:w-1/2 mt-2 md:mt-0 md:absolute md:left-1/2 md:transform md:-translate-x-1/2 z-20">
-          <SearchBar/>
+          <SearchBar />
         </div>
       </div>
 
       {/* Secondary Navigation (Desktop Only) */}
-      <MenuItem/>
+      <MenuItem />
 
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-md border-t md:hidden z-50">

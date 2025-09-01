@@ -87,11 +87,18 @@ export default function ProductSection() {
                 )}
               </div>
 
-              <div className="mt-2 flex items-center justify-between">
+              <div className="mt-2">
+                {/* Price */}
                 <span className="text-green-600 font-bold text-base md:text-lg">
                   ৳ {product.price}
                 </span>
               </div>
+              {/* Add to Bag button */}
+                <button
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm rounded-md transition"
+                >
+                  Add To Bag
+                </button>
             </div>
 
             {/* Hover Overlay */}
