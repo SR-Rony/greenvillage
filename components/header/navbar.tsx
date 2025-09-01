@@ -2,25 +2,39 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { User, Home, LayoutGrid, Package, Phone, LogOut, Settings,LayoutDashboard  } from "lucide-react";
+import {
+  User,
+  Home,
+  LayoutGrid,
+  Package,
+  Phone,
+  LogOut,
+  Settings,
+  LayoutDashboard,
+} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SearchBar from "./searchbar";
 import MenuItem from "./menuItem";
 import Sitebar from "./sitebar";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useRouter } from "next/navigation";
-import { logout as logoutAction  } from "@/redux/features/auth/authSlice";
+import { logout as logoutAction } from "@/redux/features/auth/authSlice";
+
+type UserType = {
+  name?: string;
+  role?: "user" | "admin";
+};
 
 export default function Navbar() {
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.auth.user) as UserType | null;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const userName = user?.name?.slice(0, 2).toUpperCase() || "GU"
+  const userName = user?.name?.slice(0, 2).toUpperCase() || "GU";
+  const dispatch = useAppDispatch();
+  
 
-  const dispatch = useAppDispatch()
-
-  const categories = [
+  const categories: string[] = [
     "All Products",
     "Fruits & Vegetables",
     "Meat & Fish",
@@ -33,21 +47,19 @@ export default function Navbar() {
 
   // Close dropdown if clicked outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
-    }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownRef]);
+  }, []);
 
   const handleLogout = () => {
-    dispatch(logoutAction())
+    dispatch(logoutAction());
     setDropdownOpen(false);
     router.push("/login");
-    // TODO: dispatch logout in Redux if needed
-
   };
 
   return (
@@ -91,15 +103,17 @@ export default function Navbar() {
                           <Settings className="w-4 h-4" /> Profile
                         </Link>
                       </li>
-                      <li>
-                        <Link
-                          href="/dashboard"
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 hover:text-[var(--primary)] rounded-t-xl"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          <LayoutDashboard  className="w-4 h-4" /> Dashboard
-                        </Link>
-                      </li>
+                      {user.role === "admin" && (
+                        <li>
+                          <Link
+                            href="/dashboard"
+                            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 hover:text-[var(--primary)] rounded-t-xl"
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            <LayoutDashboard className="w-4 h-4" /> Dashboard
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <button
                           onClick={handleLogout}
