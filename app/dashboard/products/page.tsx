@@ -1,272 +1,160 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-import { Plus, Edit, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { Trash2, Image as ImageIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Link from "next/link";
+
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+interface Category {
+  _id: string;
+  name: string;
+}
+
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  unit: string;
+  quantity: number;
+  description?: string;
+  images: { url: string }[];
+  category?: { _id: string; name: string };
+}
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Fresh Eggs",
-      price: 3.5,
-      stock: 120,
-      category: "Food",
-      status: "Active",
-      image: "/products/eggs.jpg",
-    },
-    {
-      id: 2,
-      name: "Organic Chicken",
-      price: 12.0,
-      stock: 35,
-      category: "Meat",
-      status: "Active",
-      image: "/products/chicken.jpg",
-    },
-    {
-      id: 3,
-      name: "Fresh Fish",
-      price: 8.0,
-      stock: 0,
-      category: "Seafood",
-      status: "Out of stock",
-      image: "/products/fish.jpg",
-    },
-  ]);
 
-  // Form state
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-    status: "Active",
-    image: "",
-  });
+  // ✅ Fetch products
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${baseUrl}/products`);
+      const data = await res.json();
 
-  const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.price || !newProduct.stock || !newProduct.category) {
-      alert("Please fill all required fields");
-      return;
+      setProducts(Array.isArray(data) ? data : data.products || []);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setProducts([]);
     }
+  };
 
-    const product = {
-      id: products.length + 1,
-      name: newProduct.name,
-      price: parseFloat(newProduct.price),
-      stock: parseInt(newProduct.stock),
-      category: newProduct.category,
-      status: newProduct.status,
-      image: newProduct.image || "/products/default.jpg",
-    };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-    setProducts([...products, product]);
-    setNewProduct({
-      name: "",
-      price: "",
-      stock: "",
-      category: "",
-      status: "Active",
-      image: "",
-    });
+  // ✅ Delete product
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      const res = await fetch(`${baseUrl}/products/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setProducts(products.filter((p) => p._id !== id));
+      } else {
+        console.error("Failed to delete product");
+      }
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
   };
 
   const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+    (p.name ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Products</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Products</h1>
 
-        {/* Add Product Modal */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white">
-              <Plus className="w-4 h-4" /> Add Product
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {/* Name */}
-              <div>
-                <Label>Product Name</Label>
-                <Input
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  placeholder="Enter product name"
-                />
-              </div>
-
-              {/* Price */}
-              <div>
-                <Label>Price ($)</Label>
-                <Input
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                  placeholder="Enter price"
-                />
-              </div>
-
-              {/* Stock */}
-              <div>
-                <Label>Stock</Label>
-                <Input
-                  type="number"
-                  value={newProduct.stock}
-                  onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-                  placeholder="Enter stock quantity"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <Label>Category</Label>
-                <Select
-                  value={newProduct.category}
-                  onValueChange={(val) => setNewProduct({ ...newProduct, category: val })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Food">Food</SelectItem>
-                    <SelectItem value="Meat">Meat</SelectItem>
-                    <SelectItem value="Seafood">Seafood</SelectItem>
-                    <SelectItem value="Vegetables">Vegetables</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Status */}
-              <div>
-                <Label>Status</Label>
-                <Select
-                  value={newProduct.status}
-                  onValueChange={(val) => setNewProduct({ ...newProduct, status: val })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Out of stock">Out of Stock</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Image */}
-              <div>
-                <Label>Product Image</Label>
-                <Input
-                  type="file"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setNewProduct({ ...newProduct, image: URL.createObjectURL(e.target.files[0]) });
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                className="bg-green-600 hover:bg-green-700 text-white"
-                onClick={handleAddProduct}
-              >
-                Save Product
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Product Table */}
-      <Card>
-        <CardHeader className="flex items-center justify-between">
-          <CardTitle>Product List</CardTitle>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Search */}
           <Input
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64"
+            className="w-full sm:w-64"
           />
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
+
+          {/* Go to Add Product Page */}
+          <Link href="/dashboard/products/add-product">
+            <Button>Add Product</Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Product Table */}
+      <div className="overflow-x-auto bg-white rounded-xl shadow-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Unit</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <TableRow key={product._id}>
                   <TableCell>
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={40}
-                      height={40}
-                      className="rounded-md"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell>
-                    {product.status === "Active" ? (
-                      <Badge className="bg-green-100 text-green-700">Active</Badge>
+                    {product.images?.[0]?.url ? (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.name}
+                        className="w-12 h-12 object-cover rounded-md"
+                      />
                     ) : (
-                      <Badge className="bg-red-100 text-red-700">Out of Stock</Badge>
+                      <ImageIcon className="w-6 h-6 text-gray-400" />
                     )}
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="icon" variant="outline">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button size="icon" variant="destructive">
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>
+                    ৳{Number(product.price).toLocaleString("en-BD")}
+                  </TableCell>
+                  <TableCell>{product.unit}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
+                  <TableCell>{product.category?.name || "-"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDelete(product._id)}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {filteredProducts.length === 0 && (
-            <p className="text-center text-gray-500 py-6">No products found.</p>
-          )}
-        </CardContent>
-      </Card>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-gray-500 py-6"
+                >
+                  No products found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         <div className="flex items-center gap-2 p-4 border-b">
           <Image src="/logo.png" alt="Greenvillage" width={36} height={36} />
-          <span className="text-lg font-bold text-green-600">Greenvillage</span>
+          <Link href={"/"} className="text-lg font-bold text-green-600">Greenvillage</Link>
         </div>
 
         <nav className="mt-4 space-y-1">
