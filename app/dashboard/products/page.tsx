@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2, Image as ImageIcon } from "lucide-react";
+import { Trash2, Image as ImageIcon, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import Image from "next/image";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -115,7 +116,7 @@ export default function ProductsPage() {
                 <TableRow key={product._id}>
                   <TableCell>
                     {product.images?.[0]?.url ? (
-                      <img
+                      <Image
                         src={product.images[0].url}
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded-md"
@@ -131,7 +132,15 @@ export default function ProductsPage() {
                   <TableCell>{product.unit}</TableCell>
                   <TableCell>{product.quantity}</TableCell>
                   <TableCell>{product.category?.name || "-"}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right flex justify-end gap-2">
+                    {/* ✅ Edit button */}
+                    <Link href={`/dashboard/products/edit/${product._id}`}>
+                      <Button variant="outline" size="icon">
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                    </Link>
+
+                    {/* ✅ Delete button */}
                     <Button
                       variant="destructive"
                       size="icon"

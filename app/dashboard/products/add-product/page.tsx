@@ -12,7 +12,6 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -22,21 +21,31 @@ interface Category {
   name: string;
 }
 
+interface NewProduct {
+  name: string;
+  price: number | string;
+  unit: string;
+  quantity: number | string;
+  description: string;
+  category: string;
+  images: File[];
+}
+
 export default function AddProductPage() {
-    const router = useRouter();
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  const [newProduct, setNewProduct] = useState<any>({
+  const [newProduct, setNewProduct] = useState<NewProduct>({
     name: "",
     price: "",
     unit: "kg",
     quantity: "",
     description: "",
     category: "",
-    images: [] as File[],
+    images: [],
   });
 
-  // ✅ Fetch categories
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -51,7 +60,7 @@ export default function AddProductPage() {
     fetchCategories();
   }, []);
 
-  // ✅ Add Product
+  // Add Product
   const handleAddProduct = async () => {
     if (!newProduct.name || !newProduct.price || !newProduct.category) {
       toast.error("Please fill in all required fields");
@@ -62,15 +71,13 @@ export default function AddProductPage() {
     try {
       const formData = new FormData();
       formData.append("name", newProduct.name);
-      formData.append("price", newProduct.price);
+      formData.append("price", String(newProduct.price));
       formData.append("unit", newProduct.unit);
-      formData.append("quantity", newProduct.quantity || "0");
+      formData.append("quantity", String(newProduct.quantity || "0"));
       formData.append("description", newProduct.description || "");
       formData.append("category", newProduct.category);
 
-      newProduct.images.forEach((file: File) => {
-        formData.append("images", file);
-      });
+      newProduct.images.forEach((file) => formData.append("images", file));
 
       const res = await fetch(`${baseUrl}/products`, {
         method: "POST",
@@ -155,7 +162,9 @@ export default function AddProductPage() {
         {/* Category Dropdown */}
         <Select
           value={newProduct.category}
-          onValueChange={(val) => setNewProduct({ ...newProduct, category: val })}
+          onValueChange={(val) =>
+            setNewProduct({ ...newProduct, category: val })
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Select category" />

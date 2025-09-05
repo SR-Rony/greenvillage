@@ -15,6 +15,7 @@ type Product = {
   slug: string;
   price: number;
   unit?: string;
+  quantity?: number; // optional quantity field
   images?: { url: string }[];
 };
 
@@ -23,7 +24,7 @@ export default function ProductSection() {
   const [loading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
 
-  // ✅ Fetch products from backend
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -40,10 +41,8 @@ export default function ProductSection() {
     fetchProducts();
   }, []);
 
-  // ✅ Add to cart
+  // Add to cart
   const handleAddToCart = (product: Product) => {
-    console.log(product);
-    
     dispatch(
       addItem({
         id: product._id,
@@ -97,18 +96,27 @@ export default function ProductSection() {
                     )}
                   </div>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-col gap-2">
                     <span className="text-green-600 font-bold text-base md:text-lg">
                       ৳ {Number(product.price).toLocaleString("en-BD")}
                     </span>
-                  </div>
 
-                  <Button
-                    className="px-3 py-1 text-xs md:text-sm rounded-md transition cursor-pointer"
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    Add To Bag
-                  </Button>
+                    {product.quantity && product.quantity > 0 ? (
+                      <Button
+                        className="px-3 py-1 text-xs md:text-sm rounded-md transition cursor-pointer"
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        Add To Bag
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled
+                        className="px-3 py-1 text-xs md:text-sm rounded-md transition cursor-not-allowed"
+                      >
+                        Out of Stock
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
