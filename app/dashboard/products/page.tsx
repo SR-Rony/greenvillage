@@ -38,8 +38,6 @@ export default function ProductsPage() {
     try {
       const res = await fetch(`${baseUrl}/products`);
       const data = await res.json();
-      console.log("product data",data);
-      
       setProducts(Array.isArray(data) ? data : data.products || []);
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -50,7 +48,7 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
+  
   // ✅ Delete product
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -116,7 +114,9 @@ export default function ProductsPage() {
                       <Image
                         src={product.images[0].url}
                         alt={product.name}
-                        className="w-12 h-12 object-cover rounded-md"
+                        className="object-cover"
+                        width={50}
+                        height={50}
                       />
                     ) : (
                       <ImageIcon className="w-6 h-6 text-gray-400" />
