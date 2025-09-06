@@ -17,10 +17,6 @@ import Image from "next/image";
 
 const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
-interface Category {
-  _id: string;
-  name: string;
-}
 
 interface Product {
   _id: string;
