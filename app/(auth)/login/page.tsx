@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/redux/features/auth/authSlice";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 interface LoginForm {
   email: string;

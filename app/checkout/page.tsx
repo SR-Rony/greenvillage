@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { clearCart } from "@/redux/features/cart/cartSlice";
 import { useRouter } from "next/navigation";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 export default function CheckoutPage() {
   const { items, totalAmount } = useAppSelector((s) => s.cart);

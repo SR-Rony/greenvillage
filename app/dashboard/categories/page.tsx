@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import CategoryForm from "@/components/dashboard/categori";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 type Category = {
   _id: string;

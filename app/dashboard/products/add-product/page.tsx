@@ -14,7 +14,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 interface Category {
   _id: string;

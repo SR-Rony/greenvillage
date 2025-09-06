@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 interface Category {
   _id: string;
@@ -42,7 +42,8 @@ export default function ProductsPage() {
     try {
       const res = await fetch(`${baseUrl}/products`);
       const data = await res.json();
-
+      console.log("product data",data);
+      
       setProducts(Array.isArray(data) ? data : data.products || []);
     } catch (err) {
       console.error("Error fetching products:", err);

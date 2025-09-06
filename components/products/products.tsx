@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { useAppDispatch } from "@/redux/hook";
 import { addItem } from "@/redux/features/cart/cartSlice";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 type Product = {
   _id: string;

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const baseUrl = process.env.NEXT_PUBLIC_API || "";
 
 interface FormData {
   name: string;
